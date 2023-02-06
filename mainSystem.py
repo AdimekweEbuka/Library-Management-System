@@ -8,6 +8,10 @@ class LibManagementSystem:
 
     """
     def loginAuthentication(self):
+        """
+            This is the login function, it makes use of sqlite3 to get user information from our database 
+            and compares it to user input to validate new users that want to log in to the system.
+        """
         user_ID = input("Please input your user ID number:\nEnter 'exit' to cancel\n")
         
         if user_ID == "exit":
