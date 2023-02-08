@@ -1,5 +1,7 @@
 import time
 import sqlite3
+import random
+from User import *
 
 class LibManagementSystem:
     """
@@ -7,6 +9,13 @@ class LibManagementSystem:
     also the authenticate function
 
     """
+
+    def generateRandomNumber():
+        random.seed(time.time())
+
+        return random.randint(100, 990)
+
+
     def loginAuthentication(self):
         """
             This is the login function, it makes use of sqlite3 to get user information from our database 
@@ -38,12 +47,58 @@ class LibManagementSystem:
                 print("This user does not exist")
                 LibManagementSystem.main(self)
             else:
-                print(tableList)
+                user_password = input("Please input your user password:\n")
+                if user_password == tableList[3]:
+                    print("Welcome " + tableList[1])
+                    Librarian.menu(self)
+                else:
+                    print("Username or password is incorrect")
+                    LibManagementSystem.loginAuthentication(self)
+
+
+    def registeration(self):
+        """
+        This method is used to register new users for approval from the resident librarian
+        """
+        user_name = input("Please enter your name:\n")
+        while True:
+            user_input = input("Are you a staff or a student?\nPress 1 for student\nPress 2 for staff\n")
+            if user_input == "1":
+                user_role = "Student"
+                break
+            elif user_input == "2":
+                user_role = "Staff"
+                break
+            else:
+                print("Invalid value, Please enter the correct value.")
+
+        while True:
+            user_password1 = input("Please enter your new password\n")
+            user_password2 = input("Please re-enter your password\n")
+            if user_password1 != user_password2:
+                print("Passwords do not match, please re-enter password")
+            else:
+                user_password = user_password1
+                break
+        user_ID = LibManagementSystem.generateRandomNumber()
+
+        self.conn = sqlite3.connect("NewLibraryDatabase.db")
+        self.c = self.conn.cursor()
+
+        with self.conn:
+            self.c.execute("INSERT INTO New_Users VALUES(:UserID, :Username, :UserRole, :UserPassword)", {"UserID": user_ID, "Username": user_name, "UserRole": user_role, "UserPassword": user_password } )
+            self.conn.commit()
+
+
+        print("-"*60)
+        print(f"Registeration complete!\nPlease find all your details below.\nUserName: {user_name}\nUser ID: {user_ID}\nUser role: {user_role}\nPLEASE TAKE NOT OF YOUR USER ID. GOODBYE")
+        exit()
+
 
 
     def main(self):
         """
-        This function is the main function that starts everything and it is called first when the system is launched
+        This method is the main function that starts everything and it is called first when the system is launched
         from this function the Login function and the registeration function are called
     
         """
@@ -54,7 +109,7 @@ class LibManagementSystem:
             if user_input == "1":
                 LibManagementSystem.loginAuthentication(self)
             elif user_input == "2":
-                pass
+                LibManagementSystem.registeration(self)
             elif user_input == "3":
                 print("A bientot!!")
                 exit()
